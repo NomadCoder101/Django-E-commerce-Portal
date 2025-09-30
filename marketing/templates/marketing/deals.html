@@ -1,0 +1,143 @@
+{% extends "base.html" %} {% load i18n %} {% load static %} {% block title %}{%
+trans "Deals and Promotions" %}{% endblock %} {% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">
+    {% trans "Current Deals" %}
+  </h1>
+
+  <!-- Active Banners -->
+  {% if banners %}
+  <div class="mt-8 space-y-4">
+    {% for banner in banners %}
+    <div class="relative bg-white overflow-hidden rounded-lg shadow">
+      <div class="relative">
+        <img
+          src="{{ banner.image.url }}"
+          alt="{{ banner.title }}"
+          class="w-full h-64 object-cover"
+        />
+        <div
+          class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        >
+          <div class="text-center text-white">
+            <h2 class="text-2xl font-bold mb-2">{{ banner.title }}</h2>
+            {% if banner.subtitle %}
+            <p class="text-lg">{{ banner.subtitle }}</p>
+            {% endif %}
+            <a
+              href="{{ banner.url }}"
+              class="mt-4 inline-block px-6 py-3 bg-white text-black font-semibold rounded-md hover:bg-gray-100 transition-colors"
+            >
+              {% trans "Shop Now" %}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Active Discounts -->
+  {% if discounts %}
+  <h2 class="mt-12 text-2xl font-bold text-gray-900">
+    {% trans "Available Discounts" %}
+  </h2>
+  <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {% for discount in discounts %}
+    <div
+      class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200"
+    >
+      <div class="px-6 py-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium text-gray-900">{{ discount.code }}</h3>
+          <span
+            class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+          >
+            {% if discount.discount_type == 'percentage' %} {{ discount.amount
+            }}% {% trans "OFF" %} {% elif discount.discount_type == 'fixed' %}
+            ${{ discount.amount }} {% trans "OFF" %} {% else %} {% trans "FREE
+            SHIPPING" %} {% endif %}
+          </span>
+        </div>
+        {% if discount.description %}
+        <p class="mt-2 text-sm text-gray-500">{{ discount.description }}</p>
+        {% endif %}
+      </div>
+      <div class="px-6 py-4 bg-gray-50">
+        <dl class="grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2">
+          {% if discount.min_purchase %}
+          <div>
+            <dt class="text-sm font-medium text-gray-500">
+              {% trans "Min Purchase" %}
+            </dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              ${{ discount.min_purchase }}
+            </dd>
+          </div>
+          {% endif %} {% if discount.max_uses %}
+          <div>
+            <dt class="text-sm font-medium text-gray-500">
+              {% trans "Uses Left" %}
+            </dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              {{ discount.max_uses|sub:discount.uses_count }}
+            </dd>
+          </div>
+          {% endif %} {% if discount.valid_until %}
+          <div class="sm:col-span-2">
+            <dt class="text-sm font-medium text-gray-500">
+              {% trans "Valid Until" %}
+            </dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              {{ discount.valid_until|date:"F j, Y" }}
+            </dd>
+          </div>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %} {% if not banners and not discounts %}
+  <div class="mt-8 text-center">
+    <p class="text-lg text-gray-500">
+      {% trans "No active deals or promotions at the moment. Check back soon!"
+      %}
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- Newsletter Signup -->
+  <div class="mt-16 bg-blue-50 rounded-lg px-6 py-8">
+    <div class="max-w-xl mx-auto text-center">
+      <h2 class="text-2xl font-bold text-blue-900">
+        {% trans "Stay Updated on New Deals" %}
+      </h2>
+      <p class="mt-2 text-blue-700">
+        {% trans "Subscribe to our newsletter and never miss out on exclusive
+        deals and promotions." %}
+      </p>
+
+      <form
+        hx-post="{% url 'marketing:newsletter_signup' %}"
+        hx-target="#newsletter-form"
+        hx-swap="outerHTML"
+        id="newsletter-form"
+        class="mt-6"
+      >
+        {% csrf_token %}
+        <div class="flex max-w-md mx-auto">
+          {{ newsletter_form.email }}
+          <button
+            type="submit"
+            class="ml-4 px-6 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            {% trans "Subscribe" %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

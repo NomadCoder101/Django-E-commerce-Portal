@@ -1,0 +1,136 @@
+{% extends "base.html" %} {% load i18n %} {% load static %} {% block title %}{%
+trans "Dashboard" %}{% endblock %} {% block content %}
+<div class="bg-gray-50 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-8">
+      {% trans "My Account" %}
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {# User Profile Card #}
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+          {% if user.profile.avatar %}
+          <img
+            src="{{ user.profile.avatar.url }}"
+            alt="{{ user.get_full_name }}"
+            class="w-16 h-16 rounded-full"
+          />
+          {% else %}
+          <div
+            class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center"
+          >
+            <svg
+              class="w-8 h-8 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+          </div>
+          {% endif %}
+          <div class="ml-4">
+            <h2 class="text-lg font-medium text-gray-900">
+              {{ user.get_full_name|default:user.username }}
+            </h2>
+            <p class="text-sm text-gray-600">{{ user.email }}</p>
+          </div>
+        </div>
+        <div class="mt-6">
+          <a
+            href="{% url 'customers:profile' %}"
+            class="block text-center w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+          >
+            {% trans "Edit Profile" %}
+          </a>
+        </div>
+      </div>
+
+      {# Recent Orders #}
+      <div class="bg-white rounded-lg shadow p-6 md:col-span-2">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">
+          {% trans "Recent Orders" %}
+        </h3>
+        {% if recent_orders %}
+        <div class="space-y-4">
+          {% for order in recent_orders %}
+          <div class="border-b border-gray-200 pb-4 last:border-0">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-sm font-medium text-gray-900">
+                  {% trans "Order" %} #{{ order.id }}
+                </p>
+                <p class="text-sm text-gray-600">{{ order.created_at|date }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-medium text-gray-900">
+                  {{ order.get_total_display }}
+                </p>
+                <p class="text-sm text-gray-600">
+                  {{ order.get_status_display }}
+                </p>
+              </div>
+            </div>
+            <div class="mt-2">
+              <a
+                href="{% url 'orders:detail' order.id %}"
+                class="text-sm text-blue-600 hover:text-blue-500"
+              >
+                {% trans "View Order Details" %}
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="mt-4">
+          <a
+            href="{% url 'customers:orders' %}"
+            class="text-sm text-blue-600 hover:text-blue-500"
+          >
+            {% trans "View All Orders" %}
+          </a>
+        </div>
+        {% else %}
+        <p class="text-gray-600">{% trans "No orders found." %}</p>
+        {% endif %}
+      </div>
+
+      {# Saved Addresses #}
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">
+          {% trans "Saved Addresses" %}
+        </h3>
+        {% if addresses %}
+        <div class="space-y-4">
+          {% for address in addresses %}
+          <div class="border-b border-gray-200 pb-4 last:border-0">
+            <p class="text-sm font-medium text-gray-900">{{ address.name }}</p>
+            <p class="text-sm text-gray-600">{{ address.street_address }}</p>
+            <p class="text-sm text-gray-600">
+              {{ address.city }}, {{ address.state }} {{ address.postal_code }}
+            </p>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-600">{% trans "No addresses saved." %}</p>
+        {% endif %}
+        <div class="mt-4">
+          <a
+            href="{% url 'customers:addresses' %}"
+            class="text-sm text-blue-600 hover:text-blue-500"
+          >
+            {% trans "Manage Addresses" %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

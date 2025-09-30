@@ -15,8 +15,32 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.views.i18n import JavaScriptCatalog
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    
+    # App URLs
+    path('', include('catalog.urls')),
+    path('checkout/', include('checkout.urls')),
+    path('customers/', include('customers.urls')),
+    path('orders/', include('orders.urls')),
+    path('marketing/', include('marketing.urls')),
+    path('shipping/', include('shipping.urls')),
+    
+    # API URLs - To be implemented later
+    # path('api/', include('catalog.api.urls')),
+    # path('api/checkout/', include('checkout.api.urls')),
+    # path('api/customers/', include('customers.api.urls')),
+    # path('api/orders/', include('orders.api.urls')),
+    # path('api/marketing/', include('marketing.api.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,0 +1,89 @@
+<!-- discount_success.html -->
+<div id="discount-form" class="mt-4">
+  <div class="rounded-md bg-green-50 p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg
+          class="h-5 w-5 text-green-400"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm font-medium text-green-800">
+          {% trans "Discount applied successfully!" %}
+        </p>
+        <p class="mt-1 text-sm text-green-700">
+          {% if discount.discount_type == 'percentage' %} {{ discount.amount }}%
+          {% trans "off your order" %} {% elif discount.discount_type == 'fixed'
+          %} ${{ discount.amount }} {% trans "off your order" %} {% else %} {%
+          trans "Free shipping applied" %} {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Summary -->
+  <div class="mt-4">
+    <div class="border-t border-gray-200 pt-4">
+      <dl class="space-y-2">
+        <div class="flex justify-between">
+          <dt class="text-sm text-gray-600">{% trans "Subtotal" %}</dt>
+          <dd class="text-sm font-medium text-gray-900">
+            ${{ cart.get_subtotal }}
+          </dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-sm text-gray-600">{% trans "Discount" %}</dt>
+          <dd class="text-sm font-medium text-green-600">
+            -${{ cart.get_discount_amount }}
+          </dd>
+        </div>
+        <div class="flex justify-between border-t border-gray-200 pt-2">
+          <dt class="text-base font-medium text-gray-900">
+            {% trans "Total" %}
+          </dt>
+          <dd class="text-base font-medium text-gray-900">
+            ${{ cart.get_total }}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Remove Discount Button -->
+  <div class="mt-4">
+    <form
+      hx-post="{% url 'marketing:remove_discount' %}"
+      hx-target="#discount-form"
+      hx-swap="outerHTML"
+    >
+      {% csrf_token %}
+      <button
+        type="submit"
+        class="inline-flex items-center text-sm text-red-600 hover:text-red-500"
+      >
+        <svg
+          class="mr-1.5 h-4 w-4"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        {% trans "Remove discount" %}
+      </button>
+    </form>
+  </div>
+</div>

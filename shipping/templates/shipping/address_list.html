@@ -1,0 +1,93 @@
+{% extends "base.html" %} {% load i18n %} {% block title %}{% trans "Shipping
+Addresses" %}{% endblock %} {% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="sm:flex sm:items-center mb-8">
+    <div class="sm:flex-auto">
+      <h1 class="text-3xl font-semibold text-gray-900">
+        {% trans "Your Shipping Addresses" %}
+      </h1>
+      <p class="mt-2 text-sm text-gray-700">
+        {% trans "Manage your shipping addresses for faster checkout." %}
+      </p>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <a
+        href="{% url 'shipping:address_add' %}"
+        class="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        {% trans "Add New Address" %}
+      </a>
+    </div>
+  </div>
+
+  {% if addresses %}
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {% for address in addresses %}
+    <div
+      class="relative bg-white p-6 border rounded-lg shadow-sm {% if address.is_default %}ring-2 ring-blue-500{% endif %}"
+    >
+      {% if address.is_default %}
+      <span
+        class="absolute top-2 right-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+      >
+        {% trans "Default" %}
+      </span>
+      {% endif %}
+
+      <h3 class="text-lg font-medium text-gray-900">{{ address.name }}</h3>
+      <div class="mt-2 text-sm text-gray-500">
+        <p>{{ address.address_line1 }}</p>
+        {% if address.address_line2 %}
+        <p>{{ address.address_line2 }}</p>
+        {% endif %}
+        <p>{{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
+        <p>{{ address.get_country_display }}</p>
+        <p class="mt-2">{{ address.phone }}</p>
+      </div>
+
+      <div class="mt-6 flex space-x-3">
+        <a
+          href="{% url 'shipping:address_edit' address.pk %}"
+          class="flex-1 text-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          {% trans "Edit" %}
+        </a>
+        {% if not address.is_default %}
+        <form
+          method="post"
+          action="{% url 'shipping:set_default_address' address.pk %}"
+          class="flex-1"
+        >
+          {% csrf_token %}
+          <button
+            type="submit"
+            class="w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            {% trans "Make Default" %}
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-12">
+    <h3 class="mt-2 text-sm font-medium text-gray-900">
+      {% trans "No shipping addresses" %}
+    </h3>
+    <p class="mt-1 text-sm text-gray-500">
+      {% trans "Add a new shipping address to get started." %}
+    </p>
+    <div class="mt-6">
+      <a
+        href="{% url 'shipping:address_add' %}"
+        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        {% trans "Add New Address" %}
+      </a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

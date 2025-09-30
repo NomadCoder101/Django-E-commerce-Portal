@@ -1,0 +1,129 @@
+{% extends "base.html" %} {% load i18n %} {% load static %} {% block title %}{{
+product.name }}{% endblock %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="flex flex-wrap -mx-4">
+    {# Product Images #}
+    <div
+      class="w-full md:w-1/2 px-4 mb-8"
+      x-data="{ activeImage: '{{ product.images.first.image.url }}' }"
+    >
+      <div class="mb-4">
+        <img
+          :src="activeImage"
+          class="w-full h-96 object-cover rounded-lg shadow-lg"
+          :alt="product.name"
+        />
+      </div>
+      <div class="flex space-x-4 overflow-x-auto">
+        {% for image in product.images.all %}
+        <button
+          @click="activeImage = '{{ image.image.url }}'"
+          class="flex-shrink-0 w-24 h-24"
+        >
+          <img
+            src="{{ image.image.url }}"
+            alt="{{ product.name }}"
+            class="w-full h-full object-cover rounded-lg shadow"
+            :class="{'ring-2 ring-blue-500': activeImage === '{{ image.image.url }}'}"
+          />
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# Product Info #}
+    <div class="w-full md:w-1/2 px-4" x-data="{ selectedVariant: null }">
+      <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ product.name }}</h1>
+      <div class="text-2xl font-bold text-gray-900 mb-6">
+        {{ product.get_price_display }}
+      </div>
+
+      <div class="prose prose-sm text-gray-600 mb-6">
+        {{ product.description|safe }}
+      </div>
+
+      {% if product.variants.exists %}
+      <div class="mb-6">
+        <h3 class="text-sm font-medium text-gray-900 mb-4">
+          {% trans "Available Variants" %}
+        </h3>
+        <div class="grid grid-cols-4 gap-2">
+          {% for variant in product.variants.all %}
+          <button
+            @click="selectedVariant = {{ variant.id }}"
+            :class="{'ring-2 ring-blue-500': selectedVariant === {{ variant.id }}}"
+            class="p-2 text-sm border rounded hover:border-blue-500 focus:outline-none"
+          >
+            {{ variant.name }}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <button
+        hx-post="{% url 'checkout:add_to_cart' product.id %}"
+        hx-vals="js:{variant_id: selectedVariant}"
+        hx-target="#cart-count"
+        @click="$dispatch('cart-updated')"
+        class="w-full bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 mb-6"
+      >
+        {% trans "Add to Cart" %}
+      </button>
+
+      {# Product Details #}
+      <div class="border-t border-gray-200 pt-6">
+        <h3 class="text-sm font-medium text-gray-900 mb-4">
+          {% trans "Product Details" %}
+        </h3>
+        <div class="prose prose-sm text-gray-600">
+          <ul>
+            <li>{% trans "SKU" %}: {{ product.sku }}</li>
+            <li>{% trans "Category" %}: {{ product.category.name }}</li>
+            {% if product.specifications %} {% for spec in
+            product.specifications %}
+            <li>{{ spec.name }}: {{ spec.value }}</li>
+            {% endfor %} {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Related Products #} {% if related_products %}
+  <div class="mt-16">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">
+      {% trans "Related Products" %}
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {% for related in related_products %}
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <a href="{% url 'catalog:product_detail' related.slug %}">
+          {% if related.images.first %}
+          <img
+            src="{{ related.images.first.image.url }}"
+            alt="{{ related.name }}"
+            class="w-full h-48 object-cover"
+          />
+          {% endif %}
+        </a>
+        <div class="p-4">
+          <h3 class="text-lg font-semibold mb-2">
+            <a
+              href="{% url 'catalog:product_detail' related.slug %}"
+              class="text-gray-900 hover:text-blue-600"
+            >
+              {{ related.name }}
+            </a>
+          </h3>
+          <div class="text-lg font-bold text-gray-900">
+            {{ related.get_price_display }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

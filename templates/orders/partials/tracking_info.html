@@ -1,0 +1,41 @@
+{# Tracking Steps #}
+<div class="relative">
+  {% for step in tracking_info %}
+  <div class="flex items-center mb-8 last:mb-0">
+    {# Status Icon #}
+    <div
+      class="flex-shrink-0 w-8 h-8 rounded-full {% if step.completed %}bg-green-500{% else %}bg-gray-200{% endif %} flex items-center justify-center"
+    >
+      {% if step.completed %}
+      <svg
+        class="w-5 h-5 text-white"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+      {% endif %}
+    </div>
+
+    {# Status Info #}
+    <div class="ml-4 flex-1">
+      <h3 class="text-lg font-medium text-gray-900">{{ step.title }}</h3>
+      <p class="text-sm text-gray-600">{{ step.description }}</p>
+      {% if step.timestamp %}
+      <p class="text-sm text-gray-500 mt-1">
+        {{ step.timestamp|date:"F j, Y H:i" }}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %} {# Connecting Line #}
+  <div
+    class="absolute left-4 top-0 h-full w-px bg-gray-200 -translate-x-1/2"
+  ></div>
+</div>

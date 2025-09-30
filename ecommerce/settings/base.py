@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'checkout.apps.CheckoutConfig',
     'customers.apps.CustomersConfig',
     'marketing.apps.MarketingConfig',
+    'shipping.apps.ShippingConfig',
 ]
 
 MIDDLEWARE = [

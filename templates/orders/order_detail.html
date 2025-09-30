@@ -1,0 +1,203 @@
+{% extends "base.html" %} {% load i18n %} {% load static %} {% block title %}{%
+trans "Order" %} #{{ order.id }}{% endblock %} {% block content %}
+<div class="bg-gray-50 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    {# Order Header #}
+    <div class="flex flex-wrap justify-between items-start mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">
+          {% trans "Order" %} #{{ order.id }}
+        </h1>
+        <p class="text-gray-600">{{ order.created_at|date }}</p>
+      </div>
+      <div class="flex space-x-4">
+        <a
+          href="{% url 'orders:invoice' order.id %}"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+        >
+          <svg
+            class="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+            />
+          </svg>
+          {% trans "Download Invoice" %}
+        </a>
+        {% if order.can_cancel %}
+        <button
+          hx-post="{% url 'orders:cancel' order.id %}"
+          hx-confirm="{% trans 'Are you sure you want to cancel this order?' %}"
+          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+        >
+          {% trans "Cancel Order" %}
+        </button>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {# Order Items #}
+      <div class="md:col-span-2">
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">
+              {% trans "Order Items" %}
+            </h2>
+          </div>
+          <ul class="divide-y divide-gray-200">
+            {% for item in order.items.all %}
+            <li class="p-6">
+              <div class="flex">
+                <div class="flex-shrink-0 w-24 h-24">
+                  {% if item.product.images.first %}
+                  <img
+                    src="{{ item.product.images.first.image.url }}"
+                    alt="{{ item.product.name }}"
+                    class="w-full h-full object-center object-cover rounded"
+                  />
+                  {% endif %}
+                </div>
+                <div class="ml-4 flex-1">
+                  <div class="flex justify-between">
+                    <div>
+                      <h3 class="text-sm font-medium text-gray-900">
+                        <a
+                          href="{% url 'catalog:product_detail' item.product.slug %}"
+                          class="hover:text-blue-600"
+                        >
+                          {{ item.product.name }}
+                        </a>
+                      </h3>
+                      {% if item.variant %}
+                      <p class="mt-1 text-sm text-gray-600">
+                        {{ item.variant.name }}
+                      </p>
+                      {% endif %}
+                      <p class="mt-1 text-sm text-gray-600">
+                        {{ item.get_price_display }} x {{ item.quantity }}
+                      </p>
+                    </div>
+                    <p class="text-sm font-medium text-gray-900">
+                      {{ item.get_total_display }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      {# Order Summary #}
+      <div>
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">
+              {% trans "Order Summary" %}
+            </h2>
+          </div>
+          <div class="px-6 py-4">
+            <dl class="space-y-4">
+              <div class="flex justify-between">
+                <dt class="text-sm text-gray-600">{% trans "Subtotal" %}</dt>
+                <dd class="text-sm font-medium text-gray-900">
+                  {{ order.get_subtotal_display }}
+                </dd>
+              </div>
+              {% if order.discount %}
+              <div class="flex justify-between">
+                <dt class="text-sm text-gray-600">{% trans "Discount" %}</dt>
+                <dd class="text-sm font-medium text-red-600">
+                  -{{ order.get_discount_display }}
+                </dd>
+              </div>
+              {% endif %} {% if order.shipping_cost %}
+              <div class="flex justify-between">
+                <dt class="text-sm text-gray-600">{% trans "Shipping" %}</dt>
+                <dd class="text-sm font-medium text-gray-900">
+                  {{ order.get_shipping_cost_display }}
+                </dd>
+              </div>
+              {% endif %}
+              <div class="flex justify-between pt-4 border-t border-gray-200">
+                <dt class="text-base font-medium text-gray-900">
+                  {% trans "Total" %}
+                </dt>
+                <dd class="text-base font-medium text-gray-900">
+                  {{ order.get_total_display }}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        {# Shipping Info #}
+        <div class="mt-6 bg-white rounded-lg shadow overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">
+              {% trans "Shipping Information" %}
+            </h2>
+          </div>
+          <div class="px-6 py-4">
+            <p class="text-sm text-gray-600">
+              {{ order.shipping_address.name }}
+            </p>
+            <p class="text-sm text-gray-600">
+              {{ order.shipping_address.street_address }}
+            </p>
+            <p class="text-sm text-gray-600">
+              {{ order.shipping_address.city }}, {{ order.shipping_address.state
+              }} {{ order.shipping_address.postal_code }}
+            </p>
+            <p class="text-sm text-gray-600">
+              {{ order.shipping_address.country }}
+            </p>
+            {% if order.tracking_number %}
+            <div class="mt-4">
+              <a
+                href="{% url 'orders:track' order.id %}"
+                class="text-blue-600 hover:text-blue-500"
+              >
+                {% trans "Track Order" %}
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {# Payment Info #}
+        <div class="mt-6 bg-white rounded-lg shadow overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">
+              {% trans "Payment Information" %}
+            </h2>
+          </div>
+          <div class="px-6 py-4">
+            <p class="text-sm text-gray-600">
+              {% trans "Payment Method" %}: {{ order.get_payment_method_display
+              }}
+            </p>
+            <p class="text-sm text-gray-600">
+              {% trans "Payment Status" %}: {{ order.get_payment_status_display
+              }}
+            </p>
+            {% if order.payment_id %}
+            <p class="text-sm text-gray-600">
+              {% trans "Payment ID" %}: {{ order.payment_id }}
+            </p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

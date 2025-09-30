@@ -1,0 +1,68 @@
+{% extends "base.html" %} {% load i18n %} {% block title %}{{ title }}{%
+endblock %} {% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <h1 class="text-3xl font-semibold text-gray-900 mb-8">{{ title }}</h1>
+
+  <form method="post" class="space-y-6">
+    {% csrf_token %} {% if form.non_field_errors %}
+    <div class="rounded-md bg-red-50 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg
+            class="h-5 w-5 text-red-400"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            {{ form.non_field_errors }}
+          </h3>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 gap-y-6">
+      {% for field in form %}
+      <div>
+        <label
+          for="{{ field.id_for_label }}"
+          class="block text-sm font-medium text-gray-700"
+        >
+          {{ field.label }}
+        </label>
+        <div class="mt-1">{{ field }}</div>
+        {% if field.help_text %}
+        <p class="mt-2 text-sm text-gray-500">{{ field.help_text }}</p>
+        {% endif %} {% if field.errors %}
+        <p class="mt-2 text-sm text-red-600">{{ field.errors.0 }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="mt-8 flex justify-end space-x-4">
+      <a
+        href="{% url 'shipping:address_list' %}"
+        class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        {% trans "Cancel" %}
+      </a>
+      <button
+        type="submit"
+        class="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        {% trans "Save Address" %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

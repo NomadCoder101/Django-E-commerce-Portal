@@ -4,6 +4,19 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
 
 
+class NewsletterSubscription(models.Model):
+    email = models.EmailField(_('Email address'), unique=True)
+    subscribed_at = models.DateTimeField(_('Subscribed at'), auto_now_add=True)
+    is_active = models.BooleanField(_('Active'), default=True)
+
+    class Meta:
+        verbose_name = _('Newsletter subscription')
+        verbose_name_plural = _('Newsletter subscriptions')
+
+    def __str__(self):
+        return self.email
+
+
 class DiscountCode(models.Model):
     DISCOUNT_TYPES = [
         ('percentage', _('Percentage')),

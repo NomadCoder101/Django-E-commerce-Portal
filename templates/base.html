@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+{% load static i18n %} {% load tailwind_tags %}
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Django E-commerce Portal{% endblock %}</title>
+
+    {# Favicon #}
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'img/favicon.ico' %}"
+    />
+
+    {# TailwindCSS #} {% tailwind_css %} {# Alpine.js #}
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+
+    {# HTMX #}
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+
+    {# Custom CSS #}
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}" />
+
+    {# Extra CSS #} {% block extra_css %}{% endblock %} {# Meta tags #} {% block
+    meta %}
+    <meta
+      name="description"
+      content="{% block meta_description %}A feature-rich e-commerce platform{% endblock %}"
+    />
+    <meta
+      name="keywords"
+      content="{% block meta_keywords %}ecommerce, shop, online store{% endblock %}"
+    />
+    {% endblock %}
+  </head>
+  <body
+    class="flex flex-col min-h-screen bg-gray-50"
+    x-data="{ mobileMenu: false, cartOpen: false }"
+  >
+    {# Header #} {% include "base/header.html" %} {# Messages #} {% if messages
+    %}
+    <div class="container mx-auto px-4">
+      {% for message in messages %}
+      <div
+        class="my-4 p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}"
+        role="alert"
+      >
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %} {# Main content #}
+    <main class="flex-grow">{% block content %}{% endblock %}</main>
+
+    {# Footer #} {% include "base/footer.html" %} {# Cart sidebar #} {% include
+    "base/cart_sidebar.html" %} {# JavaScript #}
+    <script src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,142 @@
+{% extends "base.html" %} {% load i18n %} {% load static %} {% block title %}{%
+trans "Checkout" %}{% endblock %} {% block extra_css %}
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold text-gray-900 mb-8">{% trans "Checkout" %}</h1>
+
+  <div class="flex flex-col lg:flex-row lg:space-x-8">
+    {# Order Summary #}
+    <div class="lg:w-2/3">
+      <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">
+          {% trans "Order Summary" %}
+        </h2>
+
+        {% for item in cart.items.all %}
+        <div
+          class="flex items-center py-4 border-b border-gray-200 last:border-0"
+        >
+          <div class="w-16 flex-shrink-0">
+            {% if item.product.images.first %}
+            <img
+              src="{{ item.product.images.first.image.url }}"
+              alt="{{ item.product.name }}"
+              class="w-full h-16 object-cover rounded"
+            />
+            {% endif %}
+          </div>
+          <div class="ml-4 flex-1">
+            <h3 class="text-sm font-medium text-gray-900">
+              {{ item.product.name }}
+            </h3>
+            {% if item.variant %}
+            <p class="text-sm text-gray-600">{{ item.variant.name }}</p>
+            {% endif %}
+            <div class="mt-1 text-sm text-gray-600">
+              {{ item.get_price_display }} x {{ item.quantity }}
+            </div>
+          </div>
+          <div class="ml-4">
+            <div class="text-sm font-medium text-gray-900">
+              {{ item.get_total_display }}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+        <div class="mt-6 border-t border-gray-200 pt-4">
+          <div class="flex justify-between">
+            <span class="text-base font-medium text-gray-900"
+              >{% trans "Subtotal" %}</span
+            >
+            <span class="text-base font-medium text-gray-900"
+              >{{ cart.get_subtotal_display }}</span
+            >
+          </div>
+          {% if cart.get_discount %}
+          <div class="flex justify-between mt-2">
+            <span class="text-base text-gray-600">{% trans "Discount" %}</span>
+            <span class="text-base text-red-600"
+              >-{{ cart.get_discount_display }}</span
+            >
+          </div>
+          {% endif %}
+          <div class="flex justify-between mt-4">
+            <span class="text-lg font-semibold text-gray-900"
+              >{% trans "Total" %}</span
+            >
+            <span class="text-lg font-semibold text-gray-900"
+              >{{ cart.get_total_display }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Payment Form #}
+    <div class="lg:w-1/3">
+      <div class="bg-gray-50 rounded-lg p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">
+          {% trans "Payment" %}
+        </h2>
+
+        <div id="payment-form">
+          <div id="payment-element"></div>
+          <button
+            id="submit-button"
+            class="mt-6 w-full bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {% trans "Pay" %} {{ cart.get_total_display }}
+          </button>
+          <div id="error-message" class="mt-4 text-red-600 text-sm"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  const stripe = Stripe("{{ stripe_public_key }}");
+  const elements = stripe.elements();
+
+  const paymentElement = elements.create("payment");
+  paymentElement.mount("#payment-element");
+
+  const form = document.getElementById("payment-form");
+  const submitButton = document.getElementById("submit-button");
+  const errorElement = document.getElementById("error-message");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    submitButton.disabled = true;
+    errorElement.textContent = "";
+
+    try {
+      const response = await fetch('{% url "checkout:checkout" %}', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+      });
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: data.sessionId,
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      errorElement.textContent = error.message;
+      submitButton.disabled = false;
+    }
+  });
+</script>
+{% endblock %}

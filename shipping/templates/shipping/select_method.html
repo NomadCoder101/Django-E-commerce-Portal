@@ -1,0 +1,118 @@
+{% extends "base.html" %} {% load i18n %} {% load humanize %} {% block title
+%}{% trans "Select Shipping Method" %}{% endblock %} {% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <h1 class="text-3xl font-semibold text-gray-900 mb-8">
+    {% trans "Select Shipping Method" %}
+  </h1>
+
+  <div class="bg-white shadow sm:rounded-lg mb-8">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900">
+        {% trans "Shipping To" %}
+      </h3>
+      <div class="mt-4">
+        <p class="text-sm text-gray-600">
+          {{ checkout_session.shipping_address.name }}
+        </p>
+        <p class="text-sm text-gray-600">
+          {{ checkout_session.shipping_address.address_line1 }}
+        </p>
+        {% if checkout_session.shipping_address.address_line2 %}
+        <p class="text-sm text-gray-600">
+          {{ checkout_session.shipping_address.address_line2 }}
+        </p>
+        {% endif %}
+        <p class="text-sm text-gray-600">
+          {{ checkout_session.shipping_address.city }}, {{
+          checkout_session.shipping_address.state }} {{
+          checkout_session.shipping_address.postal_code }}
+        </p>
+        <p class="text-sm text-gray-600">
+          {{ checkout_session.shipping_address.get_country_display }}
+        </p>
+      </div>
+      <div class="mt-4">
+        <a
+          href="{% url 'checkout:shipping_address' %}"
+          class="text-sm font-medium text-blue-600 hover:text-blue-500"
+        >
+          {% trans "Change Address" %}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <form method="post" class="space-y-6">
+    {% csrf_token %} {% if form.non_field_errors %}
+    <div class="rounded-md bg-red-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg
+            class="h-5 w-5 text-red-400"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            {{ form.non_field_errors }}
+          </h3>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="space-y-4">
+          {% for radio in form.shipping_method %} {% with
+          method=radio.choice_label %}
+          <div
+            class="relative flex items-start py-4 border-b border-gray-200 last:border-0"
+          >
+            <div class="min-w-0 flex-1 text-sm">
+              <label
+                for="{{ radio.id_for_label }}"
+                class="flex items-center cursor-pointer"
+              >
+                {{ radio.tag }}
+                <div class="ml-3">
+                  <p class="font-medium text-gray-900">{{ method.name }}</p>
+                  <p class="text-gray-500">
+                    {% if method.estimated_days %} {% blocktrans with
+                    days=method.estimated_days %} Estimated delivery: {{ days }}
+                    days {% endblocktrans %} {% endif %}
+                  </p>
+                </div>
+              </label>
+            </div>
+            <div class="ml-3 flex-shrink-0">
+              <span class="text-base font-medium text-gray-900">
+                {{ checkout_session.get_shipping_cost|floatformat:2|intcomma }}
+                €
+              </span>
+            </div>
+          </div>
+          {% endwith %} {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end space-x-4">
+      <button
+        type="submit"
+        class="rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        {% trans "Continue to Payment" %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
