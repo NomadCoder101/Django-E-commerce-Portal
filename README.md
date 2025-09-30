@@ -263,11 +263,11 @@ Access the API documentation at `/api/docs/` when running the development server
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
 
 ## 📬 Support
 
-For support, email [your-email@example.com](mailto:cbinary07@gmail.com) or open an issue on GitHub.
+For support, email [cbinary07@gmail.com](mailto:cbinary07@gmail.com) or open an issue on GitHub.
 
 ## 🙏 Acknowledgments
 
