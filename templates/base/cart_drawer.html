@@ -1,4 +1,11 @@
-<div x-show="cartDrawerOpen" class="fixed inset-0 overflow-hidden z-50" x-cloak>
+{% load static i18n currency_filters %}
+
+<div
+  x-show="$store.cartDrawer.open"
+  class="fixed inset-0 overflow-hidden z-50"
+  x-cloak
+  @keydown.escape.window="$store.cartDrawer.close()"
+>
   <div class="absolute inset-0 overflow-hidden">
     <div
       x-show="cartDrawerOpen"
@@ -31,7 +38,7 @@
               </h2>
               <div class="ml-3 h-7 flex items-center">
                 <button
-                  @click="cartDrawerOpen = false"
+                  @click="$store.cartDrawer.close()"
                   class="-m-2 p-2 text-gray-400 hover:text-gray-500"
                 >
                   <span class="sr-only">{% translate "Close panel" %}</span>
@@ -80,7 +87,7 @@
                             >
                           </h3>
                           <p class="ml-4">
-                            {{ item.total|currency:cart.currency }}
+                            {{ item.total|currency:cart.get_currency }}
                           </p>
                         </div>
                         {% if item.variant %}
@@ -138,14 +145,14 @@
               class="flex justify-between text-base font-medium text-gray-900"
             >
               <p>{% translate "Subtotal" %}</p>
-              <p>{{ cart.subtotal|currency:cart.currency }}</p>
+              <p>{{ cart.subtotal|currency:cart.get_currency }}</p>
             </div>
             <p class="mt-0.5 text-sm text-gray-500">
               {% translate "Shipping and taxes calculated at checkout." %}
             </p>
             <div class="mt-6">
               <a
-                href="{% url 'checkout:index' %}"
+                href="{% url 'checkout:checkout' %}"
                 class="flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary-600 hover:bg-primary-700"
               >
                 {% translate "Checkout" %}

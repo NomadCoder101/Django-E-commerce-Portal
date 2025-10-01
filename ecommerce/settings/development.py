@@ -30,6 +30,17 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
 
+# Use local memory cache for development
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+# Disable Celery for development
+CELERY_TASK_ALWAYS_EAGER = True
+
 # Static files
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 

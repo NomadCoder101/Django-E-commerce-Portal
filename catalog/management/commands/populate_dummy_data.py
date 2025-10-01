@@ -1,6 +1,8 @@
 import random
-from django.core.management.base import BaseCommand
-from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand                    postal_code=fake.postcode(),
+                    country='US',
+                    phone=fake.msisdn()[:15],
+                    is_default=Falsem django.contrib.auth import get_user_model
 from django.db import transaction
 from faker import Faker
 from decimal import Decimal
@@ -50,14 +52,16 @@ class Command(BaseCommand):
 
             CustomerProfile.objects.create(
                 user=user,
-                phone=fake.phone_number()
+                phone=fake.phone_number()[:15]
             )
 
-            # Create addresses for users
-            for _ in range(random.randint(1, 3)):
+            # Create one default shipping and one default billing address
+            for address_type in ['shipping', 'billing']:
+                # Create one default shipping and one default billing address
+            for address_type in ['shipping', 'billing']:
                 Address.objects.create(
                     user=user,
-                    type=random.choice(['shipping', 'billing']),
+                    type=address_type,
                     first_name=user.first_name,
                     last_name=user.last_name,
                     address1=fake.street_address(),
@@ -65,9 +69,41 @@ class Command(BaseCommand):
                     state=fake.state(),
                     postal_code=fake.postcode(),
                     country='US',
-                    phone=fake.msisdn()[:20],
-                    is_default=random.choice([True, False])
+                    phone=fake.phone_number()[:15],
+                    is_default=True
                 )
+                
+                # Optionally create a non-default address of each type
+                if random.choice([True, False]):
+                    Address.objects.create(
+                        user=user,
+                        type=address_type,
+                        first_name=user.first_name,
+                        last_name=user.last_name,
+                        address1=fake.street_address(),
+                        city=fake.city(),
+                        state=fake.state(),
+                        postal_code=fake.postcode(),
+                        country='US',
+                        phone=fake.phone_number()[:15],
+                        is_default=False
+                    )
+                
+                # Optionally create a non-default address of each type
+                if random.choice([True, False]):
+                    Address.objects.create(
+                        user=user,
+                        type=address_type,
+                        first_name=user.first_name,
+                        last_name=user.last_name,
+                        address1=fake.street_address(),
+                        city=fake.city(),
+                        state=fake.state(),
+                        postal_code=fake.postcode(),
+                        country='US',
+                        phone=fake.msisdn()[:20],
+                        is_default=False
+                    )
 
     def create_categories(self):
         categories = [

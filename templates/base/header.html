@@ -1,32 +1,37 @@
+{% load static i18n %}
+
 <header class="bg-white shadow-sm" x-data="{ mobileMenuOpen: false }">
   <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Top">
     <div
       class="w-full py-6 flex items-center justify-between border-b border-primary-500 lg:border-none"
     >
       <div class="flex items-center">
-        <a href="{% url 'home' %}">
+        <a href="{% url 'catalog:home' %}">
           <span class="sr-only">{{ site_name }}</span>
           <img class="h-10 w-auto" src="{% static 'img/logo.svg' %}" alt="" />
         </a>
         <div class="hidden ml-10 space-x-8 lg:block">
           <a
-            href="{% url 'catalog:product_list' %}"
+            href="{% url 'catalog:products' %}"
             class="text-base font-medium text-gray-900 hover:text-primary-600"
           >
             {% translate "Shop" %}
           </a>
           <a
-            href="{% url 'catalog:collection_list' %}"
+            href="{% url 'catalog:categories' %}"
             class="text-base font-medium text-gray-900 hover:text-primary-600"
           >
-            {% translate "Collections" %}
+            {% translate "Categories" %}
           </a>
+          {% comment %}
+          <!-- Blog section is not implemented yet -->
           <a
             href="{% url 'blog:post_list' %}"
             class="text-base font-medium text-gray-900 hover:text-primary-600"
           >
             {% translate "Blog" %}
           </a>
+          {% endcomment %}
         </div>
       </div>
       <div class="ml-10 space-x-4 flex items-center">
@@ -115,11 +120,13 @@
               @click.away="open = false"
               class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5"
             >
-              {% get_available_languages as languages %} {% for lang_code,
-              lang_name in languages %}
+              {% load custom_i18n %} {% get_available_languages as languages %}
+              {% for lang_code, lang_name in languages %}
               <a
-                href="{% translate_url lang_code %}"
+                href="{% change_lang_url lang_code %}"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                hx-get="{% change_lang_url lang_code %}"
+                hx-push-url="true"
               >
                 {{ lang_name }}
               </a>
@@ -130,7 +137,7 @@
           <!-- Cart -->
           <div class="ml-4 flow-root">
             <button
-              @click="$store.cartDrawer.open()"
+              @click="$store.cartDrawer.toggle()"
               class="group -m-2 p-2 flex items-center"
             >
               <svg
@@ -202,7 +209,7 @@
               >
                 {% translate "Settings" %}
               </a>
-              <form method="post" action="{% url 'account_logout' %}">
+              <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
                 <button
                   type="submit"
@@ -216,12 +223,12 @@
           {% else %}
           <div class="ml-4 flex space-x-4">
             <a
-              href="{% url 'account_login' %}"
+              href="{% url 'login' %}"
               class="text-base font-medium text-gray-900 hover:text-primary-600"
             >
               {% translate "Sign in" %}
             </a>
-            <a href="{% url 'account_signup' %}" class="btn">
+            <a href="{% url 'customers:register' %}" class="btn">
               {% translate "Sign up" %}
             </a>
           </div>
@@ -231,23 +238,21 @@
     </div>
     <div class="py-4 flex flex-wrap justify-center space-x-6 lg:hidden">
       <a
-        href="{% url 'catalog:product_list' %}"
+        href="{% url 'catalog:products' %}"
         class="text-base font-medium text-gray-900 hover:text-primary-600"
       >
         {% translate "Shop" %}
       </a>
       <a
-        href="{% url 'catalog:collection_list' %}"
+        href="{% url 'catalog:categories' %}"
         class="text-base font-medium text-gray-900 hover:text-primary-600"
       >
-        {% translate "Collections" %}
+        {% translate "Categories" %}
       </a>
-      <a
-        href="{% url 'blog:post_list' %}"
-        class="text-base font-medium text-gray-900 hover:text-primary-600"
-      >
-        {% translate "Blog" %}
-      </a>
+      {% comment %}
+      <!-- Blog functionality will be implemented later -->
+
+      {% endcomment %}
     </div>
   </nav>
 </header>

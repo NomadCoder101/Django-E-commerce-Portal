@@ -14,7 +14,10 @@ class ProductListView(ListView):
         category_slug = self.kwargs.get('category_slug')
         
         if category_slug:
-            queryset = queryset.filter(category__slug=category_slug)
+            # Get the category using translated slug
+            category = Category.objects.translated(slug=category_slug).first()
+            if category:
+                queryset = queryset.filter(category=category)
         
         return queryset.prefetch_related(
             'variants',
@@ -33,12 +36,22 @@ class ProductDetailView(DetailView):
     context_object_name = 'product'
     slug_url_kwarg = 'product_slug'
 
-    def get_queryset(self):
-        return super().get_queryset().prefetch_related(
-            'variants',
-            'images',
-            'category'
-        )
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        
+        slug = self.kwargs.get(self.slug_url_kwarg)
+        if slug is not None:
+            # Get the product using translated slug
+            product = Product.objects.translated(slug=slug).prefetch_related(
+                'variants',
+                'images',
+                'category'
+            ).first()
+            if product:
+                return product
+        
+        return super().get_object(queryset)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -61,21 +74,39 @@ class CategoryListView(ListView):
         )
 
 def home(request):
+    # Get featured products
     featured_products = Product.objects.filter(
         is_active=True,
-        is_featured=True
+        featured=True
     ).prefetch_related('variants', 'images')[:8]
     
+    # Get latest products
     new_arrivals = Product.objects.filter(
         is_active=True
     ).order_by('-created_at')[:8]
     
-    categories = Category.objects.prefetch_related(
+    # Get active categories with their translations
+    # Using django-parler's translated() manager to order by translated field
+    categories = Category.objects.translated().filter(
+        is_active=True
+    ).order_by(
+        'translations__name'
+    )[:6]
+    
+    # Get the IDs of our selected categories
+    category_ids = [cat.id for cat in categories]
+    
+    # Prefetch products for these specific categories
+    categories = Category.objects.translated().filter(
+        id__in=category_ids
+    ).prefetch_related(
         Prefetch(
             'products',
-            queryset=Product.objects.filter(is_active=True)[:4]
+            queryset=Product.objects.filter(
+                is_active=True
+            ).order_by('?')
         )
-    )[:6]
+    )
     
     return render(request, 'catalog/home.html', {
         'featured_products': featured_products,

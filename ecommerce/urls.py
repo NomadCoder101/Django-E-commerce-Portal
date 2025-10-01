@@ -18,12 +18,20 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import JavaScriptCatalog
 
+# Non-translatable URLs
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('i18n/', include('django.conf.urls.i18n')),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+]
+
+# Translatable URLs
+urlpatterns += i18n_patterns(
+    # Authentication URLs
+    path('auth/', include('django.contrib.auth.urls')),
+    path('admin/', admin.site.urls),
     
     # App URLs
     path('', include('catalog.urls')),
@@ -33,13 +41,13 @@ urlpatterns = [
     path('marketing/', include('marketing.urls')),
     path('shipping/', include('shipping.urls')),
     
-    # API URLs - To be implemented later
-    # path('api/', include('catalog.api.urls')),
-    # path('api/checkout/', include('checkout.api.urls')),
-    # path('api/customers/', include('customers.api.urls')),
-    # path('api/orders/', include('orders.api.urls')),
-    # path('api/marketing/', include('marketing.api.urls')),
-]
+    prefix_default_language=False,
+)
+
+# Add static/media URLs in debug mode
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

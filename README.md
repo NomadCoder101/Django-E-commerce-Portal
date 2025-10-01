@@ -1,8 +1,212 @@
 # Django E-commerce Portal
 
-A production-grade e-commerce platform built with Django, offering Shopify-like features with a single customizable theme. The platform supports multi-language, multi-currency, and includes integrated payments, marketing tools, and customer dashboards.
+A production-grade e-commerce platform built with Django, offering Shopify-like features with a single customizable theme. The platform supports multi-language, multi-currency, and includes integrated payments, m## 💻 Development Setup
 
-## 🚀 Features
+### Project Structure
+
+```
+project2/
+├── catalog/           # Product catalog management
+├── checkout/          # Checkout process and cart
+├── customers/         # Customer profiles and authentication
+├── docs/             # Project documentation
+├── ecommerce/        # Main project settings
+├── marketing/        # Marketing features
+├── orders/           # Order processing and management
+├── shipping/         # Shipping calculations and zones
+├── static/           # Static files
+├── templates/        # HTML templates
+└── requirements.txt  # Python dependencies
+```
+
+### Key Apps and Their Purpose
+
+1. **catalog/**
+
+   - Product management
+   - Categories and variants
+   - Product images and attributes
+
+2. **customers/**
+
+   - User profiles
+   - Address management
+   - Authentication views
+
+3. **orders/**
+
+   - Order processing
+   - Order history
+   - Invoice generation
+
+4. **shipping/**
+   - Shipping zones
+   - Rate calculations
+   - Carrier integration
+
+## ⚙️ Configuration
+
+### Essential Settings
+
+1. **Database Configuration** (ecommerce/settings/development.py)
+
+   ```python
+   DATABASES = {
+       'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': 'your_db_name',
+           'USER': 'your_db_user',
+           'PASSWORD': 'your_db_password',
+           'HOST': 'localhost',
+           'PORT': '5432',
+       }
+   }
+   ```
+
+2. **Cache Configuration** (ecommerce/settings/development.py)
+
+   ```python
+   CACHES = {
+       'default': {
+           'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+           'LOCATION': 'unique-snowflake',
+       }
+   }
+   ```
+
+3. **Email Configuration** (.env)
+   ```
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_USE_TLS=True
+   EMAIL_HOST_USER=your_email@gmail.com
+   EMAIL_HOST_PASSWORD=your_app_password
+   ```
+
+## 🗃️ Database Population
+
+The project includes a management command to populate the database with sample data:
+
+```bash
+python manage.py populate_data
+```
+
+This command creates:
+
+- Sample products with variants
+- Test users with addresses
+- Categories and product images
+- Sample orders
+- Shipping zones and rates
+
+## 📡 API Documentation
+
+### Available Endpoints
+
+1. **Products API**
+
+   - GET /api/products/ - List all products
+   - GET /api/products/{id}/ - Get product details
+   - POST /api/products/ - Create new product (admin only)
+
+2. **Orders API**
+
+   - GET /api/orders/ - List user orders
+   - POST /api/orders/ - Create new order
+   - GET /api/orders/{id}/ - Get order details
+
+3. **Customer API**
+   - GET /api/customer/profile/ - Get user profile
+   - PUT /api/customer/profile/ - Update profile
+   - GET /api/customer/addresses/ - List addresses
+
+## 🚀 Deployment
+
+### Production Setup
+
+1. **Update Production Settings**
+
+   - Set DEBUG=False
+   - Configure allowed hosts
+   - Set up proper email backend
+   - Configure static file serving
+
+2. **Environment Variables**
+
+   ```bash
+   SECRET_KEY=your_secret_key
+   ALLOWED_HOSTS=your_domain.com
+   DATABASE_URL=postgres://user:password@host:5432/dbname
+   REDIS_URL=redis://localhost:6379/1
+   ```
+
+3. **Static Files**
+
+   ```bash
+   python manage.py collectstatic
+   ```
+
+4. **Database Migration**
+   ```bash
+   python manage.py migrate
+   ```
+
+## ❗ Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Issues**
+
+   - Check PostgreSQL service is running
+   - Verify database credentials
+   - Ensure database exists
+
+2. **Static Files Not Loading**
+
+   - Run collectstatic
+   - Check STATIC_ROOT setting
+   - Verify web server configuration
+
+3. **Email Sending Fails**
+   - Verify SMTP credentials
+   - Check email backend configuration
+   - Test email settings
+
+### Debug Mode
+
+For development, ensure DEBUG=True in settings:
+
+```python
+DEBUG = True
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.eting tools, and customer dashboards.
+
+## � Table of Contents
+
+1. [Features](#-features)
+2. [Tech Stack](#-tech-stack)
+3. [Installation](#-installation)
+4. [Development Setup](#-development-setup)
+5. [Project Structure](#-project-structure)
+6. [Configuration](#-configuration)
+7. [Database Population](#-database-population)
+8. [API Documentation](#-api-documentation)
+9. [Deployment](#-deployment)
+10. [Troubleshooting](#-troubleshooting)
+
+## �🚀 Features
 
 ### Core Features
 
@@ -61,42 +265,69 @@ A production-grade e-commerce platform built with Django, offering Shopify-like 
 
 ### Prerequisites
 
-- Docker and Docker Compose
-- Python 3.11+
-- Node.js 18+
-- PostgreSQL 13+
-- Redis 6+
+Before starting, ensure you have the following installed:
 
-### Setup Steps
+1. Python 3.11 or higher
+2. PostgreSQL 13 or higher
+3. Redis 6 or higher (optional for development)
+4. Node.js 18 or higher
+5. Git
 
-1. Clone the repository:
+### Local Development Setup
 
-```bash
-git clone <repository-url>
-cd project2
-```
+1. **Clone the Repository**
 
-2. Set up environment variables:
+   ```bash
+   git clone https://github.com/NomadCoder101/Django-E-commerce-Portal.git
+   cd Django-E-commerce-Portal
+   ```
 
-```bash
-cp .env.example .env
-# Edit .env with your configuration
-```
+2. **Create and Activate Virtual Environment**
 
-3. Build and start Docker containers:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-```bash
-docker-compose build
-docker-compose up -d
-```
+3. **Install Dependencies**
 
-4. Run database migrations:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-```bash
-docker-compose exec web python manage.py migrate
-```
+4. **Environment Configuration**
 
-5. Create a superuser:
+   ```bash
+   cp .env.example .env
+   # Edit .env file with your settings:
+   # - Database credentials
+   # - Secret key
+   # - Email settings
+   # - API keys (Stripe, Mailchimp)
+   ```
+
+5. **Database Setup**
+
+   ```bash
+   python manage.py migrate
+   ```
+
+6. **Create Superuser**
+
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+7. **Populate Database with Sample Data**
+
+   ```bash
+   python manage.py populate_data
+   ```
+
+8. **Run Development Server**
+   ```bash
+   python manage.py runserver
+   ```
 
 ```bash
 docker-compose exec web python manage.py createsuperuser

@@ -12,12 +12,20 @@ class Cart(models.Model):
         blank=True,
         related_name='checkout_carts'
     )
-    session_key = models.CharField(max_length=40)
+    session_key = models.CharField(max_length=40, blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    currency = models.CharField(max_length=3, default='USD')
 
     class Meta:
         verbose_name = _('Cart')
+
+    def __str__(self):
+        return f'Cart {self.id} - {self.user.username if self.user else "Anonymous"}'
+
+    def get_currency(self):
+        return self.currency or 'USD'
+        return self.currency or 'USD'
         verbose_name_plural = _('Carts')
 
     def __str__(self):

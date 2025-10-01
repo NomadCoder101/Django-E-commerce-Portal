@@ -1,3 +1,4 @@
+{% load static i18n %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}" class="h-full">
   <head>
@@ -24,6 +25,7 @@
     <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" />
 
     <!-- Styles -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     {% block extra_css %}{% endblock %}
 

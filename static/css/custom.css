@@ -1,0 +1,47 @@
+/* Add any custom styles here */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom component classes */
+.btn {
+  @apply px-4 py-2 rounded-md font-semibold text-white transition-colors duration-200;
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700;
+}
+
+.btn-secondary {
+  @apply bg-gray-600 hover:bg-gray-700;
+}
+
+.form-input {
+  @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+/* Card components */
+.card {
+  @apply bg-white rounded-lg shadow-md overflow-hidden;
+}
+
+.card-header {
+  @apply px-4 py-5 border-b border-gray-200;
+}
+
+.card-body {
+  @apply p-4;
+}
+
+/* Navigation */
+.nav-link {
+  @apply text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium;
+}
+
+.nav-link-active {
+  @apply bg-gray-900 text-white;
+}
